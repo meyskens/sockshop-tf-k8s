@@ -1,0 +1,48 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: user-db
+  labels:
+    name: user-db
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: user-db
+    spec:
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: user-db
+        image: weaveworksdemos/user-db:0.3.0
+        ports:
+        - name: mongo
+          containerPort: 27017
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - CHOWN
+              - SETGID
+              - SETUID
+          readOnlyRootFilesystem: true
+        volumeMounts:
+          - mountPath: /tmp
+            name: tmp-volume
+          {{- if .Values.persistence.enabled }}
+          - mountPath: /data/db
+            name: db-volume
+          {{- end }}
+
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+        {{- if .Values.persistence.enabled }}
+        - name: db-volume
+          persistentVolumeClaim:
+            claimName: user-db
+        {{- end }}

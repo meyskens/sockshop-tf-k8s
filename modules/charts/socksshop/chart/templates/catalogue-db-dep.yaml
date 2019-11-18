@@ -1,0 +1,43 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: catalogue-db
+  labels:
+    name: catalogue-db
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: catalogue-db
+    spec:
+      initContainers:
+      - name: remove-lost-found
+        image: busybox
+        command:  ["rm", "-fr", "/var/lib/mysql/lost+found"]
+        volumeMounts:
+        - name: db-volume
+          mountPath: /var/lib/mysql
+      containers:
+      - name: catalogue-db
+        image: weaveworksdemos/catalogue-db:0.3.0
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: fake_password
+          - name: MYSQL_DATABASE
+            value: socksdb
+        ports:
+        - name: mysql
+          containerPort: 3306
+        volumeMounts:
+        {{- if .Values.persistence.enabled }}
+        - mountPath: /var/lib/mysql
+          name: db-volume
+        {{- end }}
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: db-volume
+          persistentVolumeClaim:
+            claimName: catalogue-db
+        {{- end }}

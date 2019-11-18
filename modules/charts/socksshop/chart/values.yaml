@@ -1,0 +1,34 @@
+# Default values for sock-shop.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+java:
+    options: -Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
+
+zipkin: 
+    enabled:  false
+    url: zipkin.zipkin.svc.cluster.local
+
+frontend:
+    replicas: 1
+
+loadtest:
+    replicas: 2
+    enabled: false
+
+persistence:
+    enabled: true
+    keep: false # keep PVC on helm delete
+    accessMode: ReadWriteOnce
+    size: 10G
+    storageClass: pd-ssd
+
+ingress:
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
