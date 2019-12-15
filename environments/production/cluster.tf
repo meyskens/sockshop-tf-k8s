@@ -5,5 +5,5 @@ module "cluster" {
   project            = "interview-maartje-socks"
   zone               = "europe-west1"
   dns_suffix         = "socks.maartje.dev"
-  lets_encrypt_email = "maartje+socksshop@eyskens.me"
+  lets_encrypt_email   = "maartje+socksshop@eyskens.me"
 }
